@@ -22,90 +22,58 @@
           border
           stripe
           style="width: 100%"
-          :data="pokemonList"
+          :data="mypokeList"
         >
-          <el-table-column label="编号" prop="vpid" min-width="30px" align="center">
+          <el-table-column label="编号" prop="pid" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.vpid }}</span>
+              <span>{{ row.pid }}</span>
             </template>
           </el-table-column>
-
-          <el-table-column label="名称" prop="name" min-width="40px" align="center">
+          <el-table-column label="昵称" prop="nickname" min-width="40px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.name }}</span>
+              <span>{{ row.nickname }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="形态" prop="type" min-width="80px" align="center">
+          <el-table-column label="等级" prop="level" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.type }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="属性" prop="attribute" width="92px" align="center" style="padding: 0">
-            <template slot-scope="{row}">
-              <el-tag :color="getColorByName(row.attribute1)" hit style="width:45px;padding:0;text-align: center" type="info" effect="dark">{{ row.attribute1 }}</el-tag>
-              <el-tag v-if="row.attribute2" type="info" :color="getColorByName(row.attribute2)" hit style="width:45px;padding:0;text-align: center" effect="dark">{{ row.attribute2 }}</el-tag>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="all" prop="all" min-width="30px" align="center">
-            <template slot-scope="{row}">
-              <span>{{ sumList(row.racevalue) }}</span>
+              <span>{{ row.level }}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="query.showAbility" label="hp" prop="hp" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.racevalue[0] }}</span>
+              <span>{{ getAbility(row,0) }}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="query.showAbility" label="atk" prop="atk" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.racevalue[1] }}</span>
+              <span>{{ getAbility(row,1) }}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="query.showAbility" label="def" prop="def" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.racevalue[2] }}</span>
+              <span>{{ getAbility(row,2) }}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="query.showAbility" label="sat" prop="sat" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.racevalue[3] }}</span>
+              <span>{{ getAbility(row,3) }}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="query.showAbility" label="sde" prop="sde" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.racevalue[4] }}</span>
+              <span>{{ getAbility(row,4) }}</span>
             </template>
           </el-table-column>
           <el-table-column v-if="query.showAbility" label="spd" prop="spd" min-width="30px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.racevalue[5] }}</span>
+              <span>{{ getAbility(row,5) }}</span>
             </template>
           </el-table-column>
-
-          <el-table-column label="特性1" prop="feature1" min-width="40px" align="center">
+          <el-table-column label="特性" prop="feature" min-width="40px" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.feature1 }}</span>
+              <span>{{ row.feature }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="特性2" prop="feature2" min-width="40px" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.feature2 }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="隐藏特性" prop="feature3" min-width="40px" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.feature3 }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="备注" prop="mark" min-width="80px" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.mark }}</span>
-            </template>
-          </el-table-column>
-
           <el-table-column label="操作" min-width="80px" align="center">
             <template slot-scope="{row,$index}">
               <el-button size="mini" type="info" @click="handleUpdate(row,$index)">
@@ -123,51 +91,58 @@
           <div slot="header">{{ FormStatus==0?"新增":"修改" }}</div>
           <div>
             <el-form ref="dataForm" :inline="true" :label-position="'right'" label-width="70x" :rules="rules" :model="temp">
-              <el-form-item label="编号" prop="vpid">
-                <el-input v-model.number="temp.vpid" style="width:450px" />
-              </el-form-item>
-              <el-form-item label="名称" prop="name">
-                <el-input v-model="temp.name" style="width:450px" />
-              </el-form-item>
-              <el-form-item label="属性" prop="attribute">
-                <el-select v-model="temp.attribute1" class="filter-item" placeholder="Please select" style="width:150px">
-                  <el-option v-for="item in attributeList" :key="item.id" :label="item.name" :value="item.name" />
-                </el-select>
-                {{ " " }}
-                <el-select v-model="temp.attribute2" class="filter-item" placeholder="Please select" style="width:150px">
-                  <el-option v-for="item in attributeList" :key="item.id" :label="item.name" :value="item.name" />
+              <el-form-item label="宝可梦" prop="pokemon">
+                <el-select v-model="temp.pid" class="filter-item" placeholder="Please select" style="width:400px">
+                  <el-option v-for="item in pokemonList" :key="item.id" :label="item.name+(item.type?'('+item.type+')':'')" :value="item.id" />
                 </el-select>
               </el-form-item>
-              <el-form-item label="形态" prop="type">
-                <el-input v-model="temp.type" style="width:450px" />
+              <el-form-item label="昵称" prop="nickname">
+                <el-input v-model="temp.nickname" style="width:450px" />
+              </el-form-item>
+              <el-form-item label="等级" prop="level">
+                <el-input v-model="temp.level" style="width:450px" />
               </el-form-item>
               <el-form-item label="生命" prop="HP">
-                <el-input v-model.number="temp.racevalue[0]" style="width:100%" />
-              </el-form-item>
-              <el-form-item label="物攻" prop="ATK">
-                <el-input v-model.number="temp.racevalue[1]" style="width:100%" />
-              </el-form-item>
-              <el-form-item label="物防" prop="DEF">
-                <el-input v-model.number="temp.racevalue[2]" style="width:100%" />
-              </el-form-item>
-              <el-form-item label="特攻" prop="SAT">
-                <el-input v-model.number="temp.racevalue[3]" style="width:100%" />
-              </el-form-item>
-              <el-form-item label="特防" prop="SDE">
-                <el-input v-model.number="temp.racevalue[4]" style="width:100%" />
+                <el-input v-model.number="temp.selfvalue[0]" style="width:70px" />
               </el-form-item>
               <el-form-item label="速度" prop="SPD">
-                <el-input v-model.number="temp.racevalue[5]" style="width:100%" />
+                <el-input v-model.number="temp.selfvalue[5]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="生命" prop="HP">
+                <el-input v-model.number="temp.effortvalue[0]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="速度" prop="SPD">
+                <el-input v-model.number="temp.effortvalue[5]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="物攻" prop="ATK">
+                <el-input v-model.number="temp.selfvalue[1]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="物防" prop="DEF">
+                <el-input v-model.number="temp.selfvalue[2]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="物攻" prop="ATK">
+                <el-input v-model.number="temp.effortvalue[1]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="物防" prop="DEF">
+                <el-input v-model.number="temp.effortvalue[2]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="特攻" prop="SAT">
+                <el-input v-model.number="temp.selfvalue[3]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="特防" prop="SDE">
+                <el-input v-model.number="temp.selfvalue[4]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="特攻" prop="SAT">
+                <el-input v-model.number="temp.effortvalue[3]" style="width:70px" />
+              </el-form-item>
+              <el-form-item label="特防" prop="SDE">
+                <el-input v-model.number="temp.effortvalue[4]" style="width:70px" />
               </el-form-item>
               <el-form-item label="特性" prop="feature">
-                <el-input v-model="temp.feature1" style="width:48%" placeholder="特性1" />{{ " " }}
-                <el-input v-model="temp.feature2" style="width:48%" placeholder="特性2" />
+                <el-input v-model="temp.feature" style="width:100%" placeholder="特性" />
               </el-form-item>
-              <el-form-item label="隐藏特性" prop="feature">
-                <el-input v-model="temp.feature3" style="width:100%" placeholder="隐藏特性" />
-              </el-form-item>
-              <el-form-item label="备注" prop="mark">
-                <el-input v-model="temp.mark" style="width:450px" />
+              <el-form-item label="性格" prop="character">
+                <el-input v-model="temp.character" style="width:100%" placeholder="性格" />
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="text-align: center">
@@ -194,13 +169,14 @@ export default {
   data() {
     return {
       pokemonList: [],
-      attributeList: [],
+      mypokeList: [],
       FormStatus: '',
       updateIndex: 0,
       dialogFormVisible: false,
-      temp: { racevalue: new Array(6) },
+      temp: { selfvalue: new Array(6),
+        effortvalue: new Array(6) },
       query: {
-        table: 'pokemon',
+        table: 'mypoke',
         attribute: '',
         showAbility: false,
         searchInfo: ''
@@ -216,47 +192,54 @@ export default {
 
   methods: {
     async loadResource() {
-      await this.loadList()
-      await this.loadAttributeList()
+      await this.loadPokeList()
+      await this.loadMyList()
     },
-
-    async loadList() {
-      this.pokemonList = this.praseRaceValue(await mipoke.mipokeQuery(this.query))
+    async loadMyList() {
+      this.mypokeList = this.praseValue(await mipoke.mipokeQuery(this.query))
     },
-    async loadAttributeList() {
-      this.attributeList = await mipoke.mipokeQuery({ table: 'attribute' })
+    async loadPokeList() {
+      this.pokemonList = this.praseValue(await mipoke.mipokeQuery({ table: 'pokemon' }))
     },
-    praseRaceValue(v_list) {
+    praseValue(v_list) {
       for (const item of v_list) {
-        if (typeof (item.racevalue) === 'string') {
+        if (item.racevalue && typeof (item.racevalue) === 'string') {
           item.racevalue = JSON.parse(item.racevalue)
+        }
+        if (item.effortvalue && typeof (item.effortvalue) === 'string') {
+          item.effortvalue = JSON.parse(item.effortvalue)
+        }
+        if (item.selfvalue && typeof (item.selfvalue) === 'string') {
+          item.selfvalue = JSON.parse(item.selfvalue)
         }
       }
       return v_list
     },
-    sumList(v_list) {
-      let sum = 0
-      for (const i of v_list) {
-        sum += Number(i)
-      }
-      return sum
-    },
-    getColorByName(v_name) {
-      for (const i of this.attributeList) {
-        if (i.name === v_name) {
-          return i.color
+    getPokemonById(v_id) {
+      for (const item of this.pokemonList) {
+        if (item.id === v_id) {
+          return item
         }
+      }
+      return null
+    },
+    getAbility(row, index) {
+      if (index === 0) {
+        return (this.getPokemonById(row.pid).racevalue[index] * 2 + row.effortvalue[index] / 4 + Number(row.selfvalue[index])) * Number(row.level) / 100 + Number(row.level) + 10
+      } else {
+        return ((this.getPokemonById(row.pid).racevalue[index] * 2 + row.effortvalue[index] / 4 + Number(row.selfvalue[index])) * Number(row.level) / 100 + 5)
       }
     },
     handleDelete(row, index) {
-      mipoke.mipokeUpdate({ table: 'pokemon', data: { id: row.id, status: 0 }})
+      mipoke.mipokeUpdate({ table: 'mypoke', data: { id: row.id, status: 0 }})
       this.pokemonList.splice(index, 1)
     },
     resetTemp() {
       this.temp = {
         id: 0,
         status: 1,
-        racevalue: new Array(6)
+        selfvalue: [31, 31, 31, 31, 31, 31],
+        effortvalue: [252, 252, 252, 252, 252, 252]
       }
     },
     handleCreate() {
@@ -271,7 +254,7 @@ export default {
       this.$refs['dataForm'].validate(async(valid) => {
         if (valid) {
           this.dialogFormVisible = false
-          this.pokemonList.push(await mipoke.mipokeUpdate({ table: 'pokemon', data: this.temp }))
+          this.mypokeList.push(await mipoke.mipokeUpdate({ table: 'mypoke', data: this.temp }))
         }
       })
     },
@@ -288,7 +271,7 @@ export default {
       this.$refs['dataForm'].validate(async(valid) => {
         if (valid) {
           this.dialogFormVisible = false
-          this.pokemonList[this.updateIndex] = await mipoke.mipokeUpdate({ table: 'pokemon', data: this.temp })
+          this.mypokeList[this.updateIndex] = await mipoke.mipokeUpdate({ table: 'mypoke', data: this.temp })
         }
       })
     }

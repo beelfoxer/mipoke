@@ -109,6 +109,18 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/mypoke',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/mipoke/mypoke/index.vue'),
+        name: 'mypoke',
+        meta: { title: 'mypoke', icon: 'meter', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/pokemon',
     component: Layout,
     children: [
