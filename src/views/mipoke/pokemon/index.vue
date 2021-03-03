@@ -288,7 +288,8 @@ export default {
       this.$refs['dataForm'].validate(async(valid) => {
         if (valid) {
           this.dialogFormVisible = false
-          this.pokemonList[this.updateIndex] = await mipoke.mipokeUpdate({ table: 'pokemon', data: this.temp })
+          // this.pokemonList[this.updateIndex] = await mipoke.mipokeUpdate({ table: 'pokemon', data: this.temp })
+          this.$set(this.pokemonList, this.updateIndex, await mipoke.mipokeUpdate({ table: 'pokemon', data: this.temp }))
         }
       })
     }

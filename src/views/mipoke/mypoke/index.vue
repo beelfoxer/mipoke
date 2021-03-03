@@ -74,6 +74,11 @@
               <span>{{ row.feature }}</span>
             </template>
           </el-table-column>
+          <el-table-column label="性格" prop="nature" min-width="40px" align="center">
+            <template slot-scope="{row}">
+              <span>{{ '+'+natureList[((Number(row.nature))%5)+1]+' -'+natureList[Math.floor((Number(row.nature))/5)+1] }}</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" min-width="80px" align="center">
             <template slot-scope="{row,$index}">
               <el-button size="mini" type="info" @click="handleUpdate(row,$index)">
@@ -97,52 +102,56 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="昵称" prop="nickname">
-                <el-input v-model="temp.nickname" style="width:450px" />
+                <el-input v-model="temp.nickname" style="width:200px" />
               </el-form-item>
               <el-form-item label="等级" prop="level">
-                <el-input v-model="temp.level" style="width:450px" />
+                <el-input v-model="temp.level" style="width:200px" />
               </el-form-item>
-              <el-form-item label="生命" prop="HP">
+              <el-form-item label="个|生命" prop="HP">
                 <el-input v-model.number="temp.selfvalue[0]" style="width:70px" />
               </el-form-item>
               <el-form-item label="速度" prop="SPD">
                 <el-input v-model.number="temp.selfvalue[5]" style="width:70px" />
               </el-form-item>
-              <el-form-item label="生命" prop="HP">
+              <el-form-item label="努|生命" prop="HP">
                 <el-input v-model.number="temp.effortvalue[0]" style="width:70px" />
               </el-form-item>
               <el-form-item label="速度" prop="SPD">
                 <el-input v-model.number="temp.effortvalue[5]" style="width:70px" />
               </el-form-item>
-              <el-form-item label="物攻" prop="ATK">
+              <el-form-item label="体|物攻" prop="ATK">
                 <el-input v-model.number="temp.selfvalue[1]" style="width:70px" />
               </el-form-item>
               <el-form-item label="物防" prop="DEF">
                 <el-input v-model.number="temp.selfvalue[2]" style="width:70px" />
               </el-form-item>
-              <el-form-item label="物攻" prop="ATK">
+              <el-form-item label="力|物攻" prop="ATK">
                 <el-input v-model.number="temp.effortvalue[1]" style="width:70px" />
               </el-form-item>
               <el-form-item label="物防" prop="DEF">
                 <el-input v-model.number="temp.effortvalue[2]" style="width:70px" />
               </el-form-item>
-              <el-form-item label="特攻" prop="SAT">
+              <el-form-item label="值|特攻" prop="SAT">
                 <el-input v-model.number="temp.selfvalue[3]" style="width:70px" />
               </el-form-item>
               <el-form-item label="特防" prop="SDE">
                 <el-input v-model.number="temp.selfvalue[4]" style="width:70px" />
               </el-form-item>
-              <el-form-item label="特攻" prop="SAT">
+              <el-form-item label="值|特攻" prop="SAT">
                 <el-input v-model.number="temp.effortvalue[3]" style="width:70px" />
               </el-form-item>
               <el-form-item label="特防" prop="SDE">
                 <el-input v-model.number="temp.effortvalue[4]" style="width:70px" />
               </el-form-item>
               <el-form-item label="特性" prop="feature">
-                <el-input v-model="temp.feature" style="width:100%" placeholder="特性" />
+                <el-select v-model="temp.feature" class="filter-item" placeholder="Please select" style="width:200px">
+                  <el-option v-for="item in getPokemonFeatureListById(temp.pid)" :key="item" :label="item" :value="item" />
+                </el-select>
               </el-form-item>
-              <el-form-item label="性格" prop="character">
-                <el-input v-model="temp.character" style="width:100%" placeholder="性格" />
+              <el-form-item label="性格" prop="nature">
+                <el-select v-model="temp.nature" class="filter-item" placeholder="Please select" style="width:200px">
+                  <el-option v-for="item in 25" :key="item-1" :label="'+'+natureList[((item-1)%5)+1]+'-'+natureList[Math.floor((item-1)/5)+1]" :value="item-1" />
+                </el-select>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="text-align: center">
@@ -170,11 +179,14 @@ export default {
     return {
       pokemonList: [],
       mypokeList: [],
+      natureList: ['hp', '物攻', '物防', '特攻', '特防', '速度'],
       FormStatus: '',
       updateIndex: 0,
       dialogFormVisible: false,
-      temp: { selfvalue: new Array(6),
-        effortvalue: new Array(6) },
+      temp: {
+        selfvalue: new Array(6),
+        effortvalue: new Array(6)
+      },
       query: {
         table: 'mypoke',
         attribute: '',
@@ -223,16 +235,37 @@ export default {
       }
       return null
     },
+    getPokemonFeatureListById(v_id) {
+      const t_list = []
+      const t_pokemon = this.getPokemonById(v_id)
+      if (t_pokemon) {
+        t_list.push(t_pokemon.feature1)
+        if (t_pokemon.feature2) {
+          t_list.push(t_pokemon.feature2)
+        }
+        if (t_pokemon.feature3) {
+          t_list.push(t_pokemon.feature3)
+        }
+      }
+      return t_list
+    },
     getAbility(row, index) {
       if (index === 0) {
-        return (this.getPokemonById(row.pid).racevalue[index] * 2 + row.effortvalue[index] / 4 + Number(row.selfvalue[index])) * Number(row.level) / 100 + Number(row.level) + 10
+        return Math.floor((this.getPokemonById(row.pid).racevalue[index] * 2 + row.effortvalue[index] / 4 + Number(row.selfvalue[index])) * Number(row.level) / 100 + Number(row.level) + 10)
       } else {
-        return ((this.getPokemonById(row.pid).racevalue[index] * 2 + row.effortvalue[index] / 4 + Number(row.selfvalue[index])) * Number(row.level) / 100 + 5)
+        let tr = 1
+        if (Number(row.nature) % 5 === index - 1) {
+          tr += 0.1
+        }
+        if (Number(row.nature) / 5 >= index - 1 && Number(row.nature) / 5 < index) {
+          tr -= 0.1
+        }
+        return Math.floor(((this.getPokemonById(row.pid).racevalue[index] * 2 + row.effortvalue[index] / 4 + Number(row.selfvalue[index])) * Number(row.level) / 100 + 5) * tr)
       }
     },
     handleDelete(row, index) {
       mipoke.mipokeUpdate({ table: 'mypoke', data: { id: row.id, status: 0 }})
-      this.pokemonList.splice(index, 1)
+      this.mypokeList.splice(index, 1)
     },
     resetTemp() {
       this.temp = {
@@ -253,6 +286,9 @@ export default {
     async createData() {
       this.$refs['dataForm'].validate(async(valid) => {
         if (valid) {
+          if (!this.temp.nickname || this.temp.nickname === '') {
+            this.temp.nickname = this.getPokemonById(this.temp.pid).name
+          }
           this.dialogFormVisible = false
           this.mypokeList.push(await mipoke.mipokeUpdate({ table: 'mypoke', data: this.temp }))
         }
@@ -271,7 +307,11 @@ export default {
       this.$refs['dataForm'].validate(async(valid) => {
         if (valid) {
           this.dialogFormVisible = false
-          this.mypokeList[this.updateIndex] = await mipoke.mipokeUpdate({ table: 'mypoke', data: this.temp })
+          if (!this.temp.nickname || this.temp.nickname === '') {
+            this.temp.nickname = this.getPokemonById(this.temp.pid).name
+          }
+          // this.mypokeList[this.updateIndex] = await mipoke.mipokeUpdate({ table: 'mypoke', data: this.temp })
+          this.$set(this.mypokeList, this.updateIndex, await mipoke.mipokeUpdate({ table: 'mypoke', data: this.temp }))
         }
       })
     }
@@ -300,5 +340,8 @@ export default {
   td .cell{
     padding:0 !important;;
   }
+}
+.el-table th.gutter{
+  display: table-cell!important;
 }
 </style>
